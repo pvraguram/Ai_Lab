@@ -23,8 +23,7 @@ def ucs(graph, start, goal):
             for neighbor, weight in graph[node]:
                 if neighbor not in visited:
                     heapq.heappush(
-                        pq,
-                        (cost + weight, neighbor, path + [neighbor])
+                        pq, (cost + weight, neighbor, path + [neighbor])
                     )
 
     return None, float('inf')
