@@ -1,0 +1,71 @@
+def solve_cryptarithmetic(word1, word2, word3):
+    # Gather all unique letters
+    unique_chars = list(set(word1 + word2 + word3))
+    
+    # A base 10 cryptarithmetic puzzle can have at most 10 unique letters
+    if len(unique_chars) > 10:
+        return "No solution: More than 10 unique letters."
+    
+    # Identify leading characters that cannot be zero
+    leading_chars = {word1[0], word2[0], word3[0]}
+    
+    # Tracking assignments and used digits
+    char_to_digit = {}
+    used_digits = set()
+    
+    def word_to_number(word):
+        return int("".join(str(char_to_digit[c]) for c in word))
+    
+    def isValid():
+        # Check non-leading zero constraint
+        for char in leading_chars:
+            if char_to_digit.get(char) == 0:
+                return False
+        return True
+
+    def backtrack(index):
+        # Base Case: All letters have been assigned a digit
+        if index == len(unique_chars):
+            if isValid():
+                num1 = word_to_number(word1)
+                num2 = word_to_number(word2)
+                num3 = word_to_number(word3)
+                if num1 + num2 == num3:
+                    return True
+            return False
+        
+        char = unique_chars[index]
+        
+        # Try assigning digits 0 through 9
+        for digit in range(10):
+            if digit not in used_digits:
+                # Pruning: skip leading zero assignment early
+                if digit == 0 and char in leading_chars:
+                    continue
+                
+                # Make assignment
+                char_to_digit[char] = digit
+                used_digits.add(digit)
+                
+                # Recursion
+                if backtrack(index + 1):
+                    return True
+                
+                # Backtrack (Undo assignment)
+                del char_to_digit[char]
+                used_digits.remove(digit)
+                
+        return False
+
+    if backtrack(0):
+        print(f"Solution Found:")
+        print(f"  {word1} -> {word_to_number(word1)}")
+        print(f"+ {word2} -> {word_to_number(word2)}")
+        print(f"-------------------")
+        print(f"= {word3} -> {word_to_number(word3)}")
+        return char_to_digit
+    else:
+        return "No solution exists."
+
+# Example Usage: SEND + MORE = MONEY
+solve_cryptarithmetic("SEND", "MORE", "MONEY")

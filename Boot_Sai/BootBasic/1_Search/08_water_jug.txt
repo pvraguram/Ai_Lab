@@ -1,0 +1,31 @@
+# WATER JUG PROBLEM (BFS) - state-space search template
+# Jug1 = 4 L, Jug2 = 3 L, goal = 2 L in any jug
+# Swap deque/popleft for list/pop to get DFS.
+# Run: python 08_water_jug.txt
+from collections import deque
+
+A, B, GOAL = 4, 3, 2
+
+def next_states(x, y):
+    return [
+        (A, y), (x, B),                       # fill
+        (0, y), (x, 0),                       # empty
+        (x - min(x, B - y), y + min(x, B - y)),   # pour 1 -> 2
+        (x + min(y, A - x), y - min(y, A - x)),   # pour 2 -> 1
+    ]
+
+def bfs():
+    queue = deque([[(0, 0)]])
+    visited = {(0, 0)}
+    while queue:
+        path = queue.popleft()
+        x, y = path[-1]
+        if x == GOAL or y == GOAL:
+            return path
+        for s in next_states(x, y):
+            if s not in visited:
+                visited.add(s)
+                queue.append(path + [s])
+
+for step in bfs():
+    print(step)

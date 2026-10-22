@@ -1,0 +1,25 @@
+# DFS - Depth First Search (stack / recursion, go deep first)
+# Run: python 02_dfs.txt
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [], 'E': ['F'], 'F': []
+}
+
+def dfs(node, goal, visited=None, path=None):
+    if visited is None:
+        visited, path = set(), []
+    visited.add(node)
+    path = path + [node]
+    print("Visit:", node)
+    if node == goal:
+        return path
+    for nb in graph[node]:
+        if nb not in visited:
+            result = dfs(nb, goal, visited, path)
+            if result:
+                return result
+    return None
+
+print("Path:", dfs('A', 'F'))

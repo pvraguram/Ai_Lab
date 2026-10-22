@@ -1,0 +1,31 @@
+# Q-LEARNING ON A SIMPLE GRID WORLD (no libraries needed)
+# 1-D corridor of 6 cells: start at 0, goal at 5 (reward +10),
+# every other step reward -1. Actions: 0 = left, 1 = right.
+# Q(s,a) <- Q(s,a) + alpha * (r + gamma * max Q(s',a') - Q(s,a))
+# Run: python 01_q_learning_grid.txt
+import random
+
+N_STATES, GOAL = 6, 5
+ALPHA, GAMMA, EPSILON, EPISODES = 0.1, 0.9, 0.2, 500
+Q = [[0.0, 0.0] for _ in range(N_STATES)]
+
+def step(s, a):
+    s2 = max(0, s - 1) if a == 0 else min(N_STATES - 1, s + 1)
+    reward = 10 if s2 == GOAL else -1
+    return s2, reward, s2 == GOAL
+
+for ep in range(EPISODES):
+    s, done = 0, False
+    while not done:
+        if random.random() < EPSILON:
+            a = random.randint(0, 1)                   # explore
+        else:
+            a = 0 if Q[s][0] > Q[s][1] else 1          # exploit
+        s2, r, done = step(s, a)
+        Q[s][a] += ALPHA * (r + GAMMA * max(Q[s2]) - Q[s][a])
+        s = s2
+
+print("Q-table (left, right):")
+for s in range(N_STATES):
+    print(s, [round(q, 2) for q in Q[s]])
+print("Learned policy:", ["L" if Q[s][0] > Q[s][1] else "R" for s in range(GOAL)])

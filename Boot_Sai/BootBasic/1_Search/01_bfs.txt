@@ -1,0 +1,27 @@
+# BFS - Breadth First Search (FIFO queue, level by level)
+# Run: python 01_bfs.txt
+from collections import deque
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [], 'E': ['F'], 'F': []
+}
+
+def bfs(start, goal):
+    queue = deque([[start]])          # queue of paths
+    visited = {start}
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
+        print("Visit:", node)
+        if node == goal:
+            return path
+        for nb in graph[node]:
+            if nb not in visited:
+                visited.add(nb)
+                queue.append(path + [nb])
+    return None
+
+print("Path:", bfs('A', 'F'))

@@ -1,0 +1,66 @@
+==================================================================
+          AI LAB - BASIC TEMPLATE CODE FOR EVERY TOPIC
+==================================================================
+Each file is a short, generic version of ONE algorithm.
+In the lab, change only the DATA (graph, heuristic, function,
+tree, dataset) to fit the question you get.
+
+Run Python : python <file>.txt
+Run Prolog : swipl <file>.txt   (then type the query at the bottom)
+Install    : pip install numpy scikit-learn matplotlib gymnasium
+
+0_PEAS
+  01_peas.txt                      PEAS tables + environment types
+
+1_Search                          (change the graph / h values)
+  01_bfs.txt                       BFS
+  02_dfs.txt                       DFS
+  03_dls_iddfs.txt                 Depth-limited + Iterative deepening
+  04_ucs.txt                       Uniform cost search
+  05_greedy_best_first.txt         Greedy best-first
+  06_astar.txt                     A* on a graph (h=0 -> UCS)
+  07_astar_8_puzzle.txt            A* on puzzles (N=2 -> 4-puzzle), 2 heuristics
+  08_water_jug.txt                 State-space search (BFS; pop() for DFS)
+
+2_Local_Search                    (change f(x))
+  01_hill_climbing.txt             Maximize f(x)
+  02_simulated_annealing.txt       Minimize f(x)
+  03_genetic_algorithm.txt         Maximize f(x)=x^2, binary chromosome
+
+3_CSP
+  01_csp_backtracking_map_coloring.txt   Generic CSP (variables/domains/constraints)
+  02_n_queens_backtracking.txt     N-Queens
+  03_cryptarithmetic.txt           Any puzzle - type the 3 words at run time
+  04_sudoku.txt                    Sudoku
+
+4_Games
+  01_minimax.txt                   Minimax on any game tree (nested lists)
+  02_alpha_beta.txt                Alpha-beta on any game tree
+  03_tic_tac_toe.txt               Play vs AI (minimax)
+
+5_Prolog
+  01_prolog_basics.txt             Facts, rules, recursion, factorial, fib, lists
+  02_forward_chaining.txt          Forward chaining (data-driven)
+  03_backward_chaining.txt         Backward chaining (goal-driven)
+  04_first_order_logic.txt         FOL -> Prolog (John likes peanuts)
+  05_propositional_entailment.txt  Truth table / model checking
+  06_cnf_resolution.txt            CNF conversion + resolution proof
+  07_wumpus_world.txt              Wumpus world inference
+
+6_Bayes
+  01_naive_bayes_sklearn.txt       Any dataset (numeric + text/spam), metrics
+  02_naive_bayes_from_scratch.txt  Without sklearn (counting + Laplace)
+
+7_RL
+  01_q_learning_grid.txt           Q-learning basics (no libraries)
+  02_cartpole_q_learning.txt       Cart-Pole + reward vs episodes graph
+
+==================================================================
+HOW TO ADAPT IN THE LAB
+==================================================================
+New graph question      -> edit `graph` (and `h`) in 1_Search files
+New equation question   -> edit `def f(x)` in 2_Local_Search files
+New puzzle (CSP)        -> edit variables / domains / constraint function
+New game tree           -> edit the nested list `tree`
+New KB (Prolog)         -> edit facts and rules, keep the engine part
+New dataset (Bayes)     -> replace load_iris() with pd.read_csv(...)

@@ -1,0 +1,29 @@
+# GENERIC CSP BACKTRACKING - Map colouring (Australia)
+# Variables, Domains, Constraints (neighbours must differ)
+# Run: python 01_csp_backtracking_map_coloring.txt
+
+variables = ['WA', 'NT', 'SA', 'Q', 'NSW', 'V', 'T']
+domains = {v: ['Red', 'Green', 'Blue'] for v in variables}
+neighbors = {
+    'WA': ['NT', 'SA'], 'NT': ['WA', 'SA', 'Q'],
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'], 'Q': ['NT', 'SA', 'NSW'],
+    'NSW': ['Q', 'SA', 'V'], 'V': ['SA', 'NSW'], 'T': []
+}
+
+def consistent(var, value, assignment):
+    return all(assignment.get(n) != value for n in neighbors[var])
+
+def backtrack(assignment):
+    if len(assignment) == len(variables):
+        return assignment
+    var = next(v for v in variables if v not in assignment)
+    for value in domains[var]:
+        if consistent(var, value, assignment):
+            assignment[var] = value
+            result = backtrack(assignment)
+            if result:
+                return result
+            del assignment[var]          # backtrack
+    return None
+
+print(backtrack({}))

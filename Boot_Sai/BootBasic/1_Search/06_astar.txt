@@ -1,0 +1,34 @@
+# A* SEARCH - f(n) = g(n) + h(n)
+# Optimal when h is admissible (never overestimates).
+# Change graph / h for any question. (h = all 0 -> UCS)
+# Run: python 06_astar.txt
+import heapq
+
+graph = {
+    'S': [('A', 1), ('B', 4)],
+    'A': [('B', 2), ('C', 5)],
+    'B': [('C', 1)],
+    'C': [('G', 3)],
+    'G': []
+}
+h = {'S': 7, 'A': 6, 'B': 4, 'C': 3, 'G': 0}
+
+def astar(start, goal):
+    pq = [(h[start], 0, start, [start])]      # (f, g, node, path)
+    visited = set()
+    while pq:
+        f, g, node, path = heapq.heappop(pq)
+        if node in visited:
+            continue
+        visited.add(node)
+        print(f"Expand {node}: g={g} h={h[node]} f={f}")
+        if node == goal:
+            return path, g
+        for nb, w in graph[node]:
+            if nb not in visited:
+                g2 = g + w
+                heapq.heappush(pq, (g2 + h[nb], g2, nb, path + [nb]))
+    return None, None
+
+path, cost = astar('S', 'G')
+print("Path:", path, "Cost:", cost)

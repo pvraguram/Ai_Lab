@@ -1,0 +1,95 @@
+from collections import deque
+
+def water_jug_bfs(capacity1, capacity2, target):
+    visited = set()
+    queue = deque()
+
+    # Initial state: both jugs are empty
+    queue.append((0, 0))
+
+    while queue:
+        jug1, jug2 = queue.popleft()
+
+        if (jug1, jug2) in visited:
+            continue
+
+        visited.add((jug1, jug2))
+        print("State:", (jug1, jug2))
+
+        # Target reached
+        if jug1 == target or jug2 == target:
+            print("Target reached!")
+            return
+
+        states = []
+
+        # Fill Jug 1
+        states.append((capacity1, jug2))
+
+        # Fill Jug 2
+        states.append((jug1, capacity2))
+
+        # Empty Jug 1
+        states.append((0, jug2))
+
+        # Empty Jug 2
+        states.append((jug1, 0))
+
+        # Pour Jug 1 -> Jug 2
+        amount = min(jug1, capacity2 - jug2)
+        states.append((jug1 - amount, jug2 + amount))
+
+        # Pour Jug 2 -> Jug 1
+        amount = min(jug2, capacity1 - jug1)
+        states.append((jug1 + amount, jug2 - amount))
+
+        for state in states:
+            if state not in visited:
+                queue.append(state)
+
+
+# Example
+water_jug_bfs(4, 3, 2)
+
+
+
+def water_jug_dfs(capacity1, capacity2, target):
+    start = (0, 0)
+    stack = [(start, [start])]
+    visited = set()
+
+    while stack:
+        (a, b), path = stack.pop()
+
+        if (a, b) in visited:
+            continue
+
+        visited.add((a, b))
+
+        if a == target or b == target:
+            print("Solution path:")
+            for state in path:
+                print(state)
+            return path
+
+        amount = min(a, capacity2 - b)
+        amount2 = min(b, capacity1 - a)
+
+        next_states = [
+            (capacity1, b),       # Fill jug 1
+            (a, capacity2),       # Fill jug 2
+            (0, b),               # Empty jug 1
+            (a, 0),               # Empty jug 2
+            (a - amount, b + amount),   # Pour 1 -> 2
+            (a + amount2, b - amount2)  # Pour 2 -> 1
+        ]
+
+        for state in next_states:
+            if state not in visited:
+                stack.append((state, path + [state]))
+
+    print("No solution found.")
+    return None
+
+
+water_jug_dfs(4, 3, 2)

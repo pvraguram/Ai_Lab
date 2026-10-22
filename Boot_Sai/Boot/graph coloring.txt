@@ -1,0 +1,65 @@
+def graph_coloring(graph, colors):
+
+    vertices = list(graph.keys())
+
+    assignment = {}
+
+    def is_valid(vertex, color):
+
+        for neighbor in graph[vertex]:
+
+            if neighbor in assignment:
+
+                if assignment[neighbor] == color:
+                    return False
+
+        return True
+
+    def backtrack(index):
+
+        # All vertices colored
+        if index == len(vertices):
+            return True
+
+        vertex = vertices[index]
+
+        for color in colors:
+
+            if is_valid(vertex, color):
+
+                assignment[vertex] = color
+
+                if backtrack(index + 1):
+                    return True
+
+                # Backtrack
+                del assignment[vertex]
+
+        return False
+
+    if backtrack(0):
+
+        print("\nGraph Coloring Solution:")
+
+        for vertex in vertices:
+            print(vertex, "->", assignment[vertex])
+
+        return assignment
+
+    print("No coloring possible.")
+
+    return None
+
+
+# Example:
+#
+# graph = {
+#     'A': ['B', 'C'],
+#     'B': ['A', 'C', 'D'],
+#     'C': ['A', 'B', 'D'],
+#     'D': ['B', 'C']
+# }
+#
+# colors = ['Red', 'Green', 'Blue']
+#
+# graph_coloring(graph, colors)

@@ -1,0 +1,15 @@
+# MINIMAX on a game tree (any depth)
+# Tree as nested lists; leaves are utility values. Root = MAX.
+# Run: python 01_minimax.txt
+tree = [
+    [[3, 5], [6, 9]],
+    [[1, 2], [0, -1]],
+]
+
+def minimax(node, is_max):
+    if isinstance(node, int):          # leaf
+        return node
+    values = [minimax(child, not is_max) for child in node]
+    return max(values) if is_max else min(values)
+
+print("Minimax value:", minimax(tree, True))

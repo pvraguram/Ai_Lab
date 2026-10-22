@@ -1,0 +1,92 @@
+import heapq
+
+
+# ============================================================
+# GREEDY BEST-FIRST SEARCH
+# ============================================================
+
+def greedy_bfs(graph, heuristic, start, goal):
+
+    # Priority queue: (heuristic value, node, path)
+    pq = [(heuristic[start], start, [start])]
+
+    visited = set()
+
+    while pq:
+
+        h, node, path = heapq.heappop(pq)
+
+        if node in visited:
+            continue
+
+        visited.add(node)
+
+        # Goal test
+        if node == goal:
+            return path
+
+        # Expand node
+        for neighbor in graph[node]:
+
+            if neighbor not in visited:
+
+                heapq.heappush(
+                    pq,
+                    (
+                        heuristic[neighbor],
+                        neighbor,
+                        path + [neighbor]
+                    )
+                )
+
+    return None
+
+
+# ============================================================
+# GRAPH
+# ============================================================
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F', 'G'],
+    'D': [],
+    'E': ['G'],
+    'F': ['G'],
+    'G': []
+}
+
+
+# ============================================================
+# HEURISTIC VALUES
+# Smaller h(n) = closer to goal
+# ============================================================
+
+heuristic = {
+    'A': 6,
+    'B': 4,
+    'C': 2,
+    'D': 5,
+    'E': 3,
+    'F': 1,
+    'G': 0
+}
+
+
+# ============================================================
+# RUN GREEDY BFS
+# ============================================================
+
+start = 'A'
+goal = 'G'
+
+path = greedy_bfs(graph, heuristic, start, goal)
+
+print("===== GREEDY BEST-FIRST SEARCH =====")
+
+if path:
+    print("Start:", start)
+    print("Goal:", goal)
+    print("Path:", " -> ".join(path))
+else:
+    print("No path found")

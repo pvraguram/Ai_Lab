@@ -1,0 +1,29 @@
+# CRYPTARITHMETIC - works for ANY puzzle (enter words at run time)
+# Constraints: each letter a unique digit, leading letters != 0
+# Run: python 03_cryptarithmetic.txt   (e.g. SEND MORE MONEY)
+from itertools import permutations
+
+def solve(w1, w2, w3):
+    letters = sorted(set(w1 + w2 + w3))
+    if len(letters) > 10:
+        return None
+    leading = {w1[0], w2[0], w3[0]}
+    for digits in permutations(range(10), len(letters)):
+        m = dict(zip(letters, digits))
+        if any(m[c] == 0 for c in leading):
+            continue
+        num = lambda w: int("".join(str(m[c]) for c in w))
+        if num(w1) + num(w2) == num(w3):
+            return m, num(w1), num(w2), num(w3)
+    return None
+
+words = input("Enter WORD1 WORD2 RESULT (e.g. SEND MORE MONEY): ").upper().split()
+if len(words) != 3:
+    words = ["SEND", "MORE", "MONEY"]
+res = solve(*words)
+if res:
+    m, a, b, c = res
+    print(m)
+    print(f"{a} + {b} = {c}")
+else:
+    print("No solution")

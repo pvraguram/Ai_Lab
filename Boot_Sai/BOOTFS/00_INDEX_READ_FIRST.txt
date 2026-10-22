@@ -1,0 +1,96 @@
+==================================================================
+                AI LAB - ALL QUESTIONS, ONE FILE EACH
+==================================================================
+HOW TO RUN
+  Python files : python <file>.txt      (Python runs .txt files fine)
+                 Needs: pip install numpy scikit-learn matplotlib gymnasium
+  Prolog files : swipl <file>.txt       (or in swipl: ?- consult('<file>.txt').)
+                 Then type the query shown at the bottom of the file
+                 (most have  ?- demo.  which prints everything).
+  Every file starts with the theory/formulation in comments and is
+  independent - copy only the one you need.
+
+==================================================================
+QUESTION  ->  FILE
+==================================================================
+--- PEAS --------------------------------------------------------
+PEAS for self-driving car                  01_PEAS/01_peas_all_agents.txt (Sec 1)
+PEAS for smart home temperature control    01_PEAS/01_peas_all_agents.txt (Sec 2)
+PEAS for medical diagnosis                 01_PEAS/01_peas_all_agents.txt (Sec 3)
+PEAS (any real-world agent)                01_PEAS/01_peas_all_agents.txt (Sec 4)
+
+--- SEARCH ------------------------------------------------------
+BFS and DFS for the given tree             02_Search/01_bfs_dfs_tree.txt
+UCS to reach goal state                    02_Search/02_ucs_goal_state.txt
+Ambulance routing using UCS                02_Search/03_ucs_ambulance_routing.txt
+Delivery drone, UCS min battery usage      02_Search/04_ucs_delivery_drone.txt
+A* for 4-puzzle (+ heuristic analysis)     02_Search/05_astar_4_puzzle.txt
+A* for 8-puzzle, analyze heuristics        02_Search/06_astar_8_puzzle_heuristics.txt
+A* search / A* to reach goal state         02_Search/06_astar_8_puzzle_heuristics.txt
+A* for grid map                            02_Search/07_astar_grid_map.txt
+A* with overestimated h -> suboptimal      02_Search/08_astar_overestimated_heuristic.txt
+A* and Uniform Cost Search                 02_Search/09_astar_vs_ucs.txt
+Water jug using DFS / suitable search      02_Search/10_water_jug_bfs_dfs.txt
+Greedy best-first search (extra)           02_Search/11_greedy_best_first.txt
+
+--- LOCAL SEARCH ------------------------------------------------
+Hill climbing for any application          03_Local_Search/01_hill_climbing_any_application.txt
+N-Queens using hill climbing               03_Local_Search/02_hill_climbing_n_queens.txt
+Local search for TSP / job scheduling      03_Local_Search/03_local_search_tsp_job_scheduling.txt
+Simulated annealing to reach goal state    03_Local_Search/04_simulated_annealing.txt
+Genetic algorithm (N-Queens N=6, encoding,
+  crossover, mutation)                     03_Local_Search/05_genetic_algorithm_n_queens.txt
+
+--- CSP ---------------------------------------------------------
+Cryptarithmetic SEND+MORE=MONEY            04_CSP/01_cryptarithmetic_backtracking.txt
+Cryptarithmetic SUN+FUN=SWIM               04_CSP/01_cryptarithmetic_backtracking.txt
+Cryptarithmetic TWO+TWO=FOUR               04_CSP/01_cryptarithmetic_backtracking.txt
+Cryptarithmetic with backtracking +
+  constraint specification                 04_CSP/01_cryptarithmetic_backtracking.txt
+Sudoku solver (CSP)                        04_CSP/02_sudoku_solver.txt
+Water jug as CSP (constraints + goals)     04_CSP/03_water_jug_csp.txt
+Graph / map colouring (extra)              04_CSP/04_graph_coloring_csp.txt
+
+--- GAME PLAYING ------------------------------------------------
+Minimax for Tic-Tac-Toe / Min-max          05_Game_Playing/01_minimax_tic_tac_toe.txt
+Alpha-beta pruning (+ vs minimax nodes)    05_Game_Playing/02_alpha_beta_pruning.txt
+2-ply game                                 05_Game_Playing/03_two_ply_game.txt
+
+--- LOGIC / PROLOG ----------------------------------------------
+Knowledge base using Prolog / "Prolog"     06_Logic_Prolog/01_knowledge_base_family.txt
+Anita works hard -> succeed -> promoted    06_Logic_Prolog/02_anita_works_hard_promoted.txt
+First order logic                          06_Logic_Prolog/03_first_order_logic.txt
+Forward chaining using Prolog              06_Logic_Prolog/04_forward_chaining.txt
+Propositional logic - test entailment      06_Logic_Prolog/05_propositional_entailment.txt
+Derive conclusion using prop. inference    06_Logic_Prolog/06_propositional_inference_derive_conclusion.txt
+Prolog - CNF and Resolution                06_Logic_Prolog/07_cnf_and_resolution.txt
+Wumpus world, pit and gold (prop. logic)   06_Logic_Prolog/08_wumpus_world.txt
+Cryptarithmetic in Prolog (optional)       06_Logic_Prolog/09_cryptarithmetic_prolog_clpfd.txt
+
+--- NAIVE BAYES -------------------------------------------------
+Naive Bayes spam/not spam + accuracy       07_Naive_Bayes/01_naive_bayes_spam_email.txt
+Naive Bayes, real world, 5 datasets        07_Naive_Bayes/02_naive_bayes_5_datasets.txt
+Naive Bayes classifier on any dataset      07_Naive_Bayes/03_naive_bayes_real_time_problem.txt
+Naive Bayes for a real-time problem        07_Naive_Bayes/03_naive_bayes_real_time_problem.txt
+
+--- REINFORCEMENT LEARNING --------------------------------------
+Cart-pole: implement and train agent       08_Reinforcement_Learning/01_cartpole_q_learning.txt
+
+==================================================================
+QUICK VIVA POINTS
+==================================================================
+BFS: FIFO queue, shortest in steps, complete.  DFS: stack, less memory, not optimal.
+UCS: expands lowest g(n); optimal for positive costs.
+A*: f(n)=g(n)+h(n); optimal if h is admissible (never overestimates).
+Greedy best-first: f(n)=h(n); fast but not optimal.
+Hill climbing: may stop at local maxima, plateaus, ridges -> random restart.
+Simulated annealing: accepts worse moves with prob e^(-delta/T), T decreases.
+GA: population -> selection -> crossover -> mutation -> new generation.
+CSP: variables, domains, constraints; backtracking + constraint checking.
+Minimax: MAX picks max, MIN picks min. Alpha-beta prunes when alpha >= beta,
+         same result, far fewer nodes.
+Forward chaining: data-driven (facts -> conclusions).
+Backward chaining: goal-driven (Prolog's default).
+Resolution: add NOT goal, derive empty clause -> goal proved.
+Naive Bayes: P(C|X) is proportional to P(C) * product of P(xi|C) (features independent).
+Q-learning: Q(s,a) += alpha [r + gamma max Q(s',a') - Q(s,a)].

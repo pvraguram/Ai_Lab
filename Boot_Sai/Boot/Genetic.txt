@@ -1,0 +1,204 @@
+import random
+
+
+# ============================================================
+# GENETIC ALGORITHM - MASTER CODE
+# N-QUEENS
+# ============================================================
+
+N = 8
+
+POPULATION_SIZE = 20
+GENERATIONS = 100
+MUTATION_RATE = 0.1
+
+
+# ============================================================
+# 1. CREATE A RANDOM INDIVIDUAL
+# ============================================================
+
+def create_individual():
+    return [random.randint(0, N - 1) for _ in range(N)]
+
+
+# ============================================================
+# 2. CREATE INITIAL POPULATION
+# ============================================================
+
+def create_population():
+    return [
+        create_individual()
+        for _ in range(POPULATION_SIZE)
+    ]
+
+
+# ============================================================
+# 3. FITNESS FUNCTION
+# ============================================================
+# Fewer conflicts = better solution
+# Goal = 0 conflicts
+#
+# Fitness = 1 / (1 + conflicts)
+# ============================================================
+
+def conflicts(board):
+
+    count = 0
+
+    for i in range(N):
+
+        for j in range(i + 1, N):
+
+            # Same column
+            if board[i] == board[j]:
+                count += 1
+
+            # Same diagonal
+            if abs(board[i] - board[j]) == abs(i - j):
+                count += 1
+
+    return count
+
+
+def fitness(board):
+
+    return 1 / (1 + conflicts(board))
+
+
+# ============================================================
+# 4. SELECTION
+# ============================================================
+# Select the best individuals
+# ============================================================
+
+def selection(population):
+
+    population.sort(
+        key=fitness,
+        reverse=True
+    )
+
+    return population[0], population[1]
+
+
+# ============================================================
+# 5. CROSSOVER
+# ============================================================
+# Single-point crossover
+# ============================================================
+
+def crossover(parent1, parent2):
+
+    point = random.randint(1, N - 1)
+
+    child1 = parent1[:point] + parent2[point:]
+    child2 = parent2[:point] + parent1[point:]
+
+    return child1, child2
+
+
+# ============================================================
+# 6. MUTATION
+# ============================================================
+
+def mutation(child):
+
+    if random.random() < MUTATION_RATE:
+
+        position = random.randint(0, N - 1)
+
+        child[position] = random.randint(0, N - 1)
+
+    return child
+
+
+# ============================================================
+# 7. GENETIC ALGORITHM
+# ============================================================
+
+def genetic_algorithm():
+
+    population = create_population()
+
+    for generation in range(GENERATIONS):
+
+        # Sort according to fitness
+        population.sort(
+            key=fitness,
+            reverse=True
+        )
+
+        # Best individual
+        best = population[0]
+
+        # Goal reached
+        if conflicts(best) == 0:
+
+            print("Solution found!")
+            print("Generation:", generation)
+
+            return best
+
+        # Keep best two
+        new_population = population[:2]
+
+        while len(new_population) < POPULATION_SIZE:
+
+            # Select parents
+            parent1, parent2 = selection(population)
+
+            # Crossover
+            child1, child2 = crossover(
+                parent1,
+                parent2
+            )
+
+            # Mutation
+            child1 = mutation(child1)
+            child2 = mutation(child2)
+
+            new_population.append(child1)
+
+            if len(new_population) < POPULATION_SIZE:
+                new_population.append(child2)
+
+        population = new_population
+
+    return max(
+        population,
+        key=fitness
+    )
+
+
+# ============================================================
+# 8. DISPLAY BOARD
+# ============================================================
+
+def print_board(board):
+
+    for row in range(N):
+
+        for column in range(N):
+
+            if board[row] == column:
+                print("Q", end=" ")
+            else:
+                print(".", end=" ")
+
+        print()
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+print("===== GENETIC ALGORITHM =====")
+
+solution = genetic_algorithm()
+
+print("Solution:", solution)
+print("Conflicts:", conflicts(solution))
+print("Fitness:", fitness(solution))
+
+print("\nChess Board:")
+print_board(solution)

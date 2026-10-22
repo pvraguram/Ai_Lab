@@ -1,0 +1,32 @@
+# NAIVE BAYES WITH SKLEARN - any dataset (here: Iris)
+# For text (spam): use CountVectorizer + MultinomialNB (see bottom)
+# Run: python 01_naive_bayes_sklearn.txt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+
+# ---------- numeric data ----------
+X, y = load_iris(return_X_y=True)
+# For a CSV: import pandas as pd; df = pd.read_csv("file.csv")
+#            X = df.drop("label", axis=1); y = df["label"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
+
+model = GaussianNB()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("Accuracy :", accuracy_score(y_test, pred))
+print("Precision:", precision_score(y_test, pred, average='macro'))
+print("Recall   :", recall_score(y_test, pred, average='macro'))
+print("Confusion matrix:\n", confusion_matrix(y_test, pred))
+
+# ---------- text data (spam) ----------
+msgs = ["win free cash now", "claim your free prize", "free lottery offer",
+        "meeting at 10 am", "submit the assignment", "lunch with friends today"]
+labels = [1, 1, 1, 0, 0, 0]                 # 1 = spam
+vec = CountVectorizer()
+nb = MultinomialNB().fit(vec.fit_transform(msgs), labels)
+test = ["free prize offer", "assignment meeting today"]
+print("\nSpam predictions:", dict(zip(test, nb.predict(vec.transform(test)))))

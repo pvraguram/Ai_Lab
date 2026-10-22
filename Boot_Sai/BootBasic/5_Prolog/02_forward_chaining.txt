@@ -1,0 +1,48 @@
+% ============================================================
+% FORWARD CHAINING USING PROLOG
+% Data-driven reasoning: start from known FACTS, fire every rule
+% whose premises are all known, add the conclusion as a new fact,
+% repeat until no new fact can be derived.
+% (Prolog's own query mechanism is BACKWARD chaining.)
+%
+% Rules:  croaks(X) ^ eats_flies(X) -> frog(X)
+%         chirps(X) ^ sings(X)      -> canary(X)
+%         frog(X)                   -> green(X)
+%         canary(X)                 -> yellow(X)
+% Facts:  croaks(fritz), eats_flies(fritz)
+% Goal :  What colour is Fritz?
+%
+% Run:  swipl 02_forward_chaining.txt      (or start swipl and type  ?- consult('02_forward_chaining.txt').)
+%       ?- forward_chain.
+% ============================================================
+:- dynamic known/1.
+
+known(croaks(fritz)).
+known(eats_flies(fritz)).
+
+rule([croaks(X), eats_flies(X)], frog(X)).
+rule([chirps(X), sings(X)],      canary(X)).
+rule([frog(X)],                  green(X)).
+rule([canary(X)],                yellow(X)).
+
+all_known([]).
+all_known([H|T]) :- known(H), all_known(T).
+
+forward_chain :-
+    rule(Premises, Conclusion),
+    all_known(Premises),
+    \+ known(Conclusion), !,
+    assertz(known(Conclusion)),
+    write('Fired rule '), write(Premises), write(' => '),
+    write(Conclusion), nl,
+    forward_chain.
+forward_chain :-
+    write('No new facts. Final knowledge base:'), nl,
+    forall(known(F), (write('  '), write(F), nl)).
+
+% ---------- QUERIES ----------
+% ?- forward_chain.
+%   Fired rule [croaks(fritz),eats_flies(fritz)] => frog(fritz)
+%   Fired rule [frog(fritz)] => green(fritz)
+%   No new facts. Final knowledge base: ...
+% ?- known(green(fritz)).   -> true.

@@ -1,0 +1,72 @@
+% ============================================================
+% WUMPUS WORLD - FIND PIT AND GOLD USING PROPOSITIONAL LOGIC
+%
+% 4x4 cave. The agent has visited (1,1) (2,1) (1,2) (2,2) (2,3)
+% and perceived:
+%     Breeze  at (2,1), (2,3)
+%     Stench  at (1,2), (2,3)
+%     Glitter at (2,3)
+%
+% Rules (propositional, for every cell):
+%   B(x,y) <-> P(adjacent cells)      no breeze => no pit next to it
+%   S(x,y) <-> W(adjacent cells)      no stench => no wumpus next to it
+%   Glitter(x,y) -> Gold(x,y)
+% Inference: if a breezy cell has exactly ONE neighbour that is
+% not proven pit-free, the pit must be there (same for wumpus).
+%
+% Run:  swipl 07_wumpus_world.txt      (or start swipl and type  ?- consult('07_wumpus_world.txt').)
+%       ?- demo.
+% ============================================================
+
+visited(1,1). visited(2,1). visited(1,2). visited(2,2). visited(2,3).
+
+breeze(2,1).  breeze(2,3).
+stench(1,2).  stench(2,3).
+glitter(2,3).
+
+% neighbours inside the 4x4 grid
+adj(X,Y,X2,Y) :- X2 is X+1, X2 =< 4.
+adj(X,Y,X2,Y) :- X2 is X-1, X2 >= 1.
+adj(X,Y,X,Y2) :- Y2 is Y+1, Y2 =< 4.
+adj(X,Y,X,Y2) :- Y2 is Y-1, Y2 >= 1.
+
+% ---------- PITS ----------
+no_pit(X,Y) :- visited(X,Y).
+no_pit(X,Y) :- visited(A,B), \+ breeze(A,B), adj(A,B,X,Y).
+
+pit(X,Y) :-
+    breeze(A,B), adj(A,B,X,Y), \+ no_pit(X,Y),
+    \+ ( adj(A,B,P,Q), (P,Q) \= (X,Y), \+ no_pit(P,Q) ).
+
+% ---------- WUMPUS ----------
+no_wumpus(X,Y) :- visited(X,Y).
+no_wumpus(X,Y) :- visited(A,B), \+ stench(A,B), adj(A,B,X,Y).
+
+wumpus(X,Y) :-
+    stench(A,B), adj(A,B,X,Y), \+ no_wumpus(X,Y),
+    \+ ( adj(A,B,P,Q), (P,Q) \= (X,Y), \+ no_wumpus(P,Q) ).
+
+% ---------- GOLD & SAFETY ----------
+gold(X,Y) :- glitter(X,Y).
+safe(X,Y) :- no_pit(X,Y), no_wumpus(X,Y).
+
+cell(X,Y) :- between(1,4,X), between(1,4,Y).
+
+demo :-
+    findall((X,Y), pit(X,Y), Pits),        sort(Pits, P),
+    findall((X,Y), wumpus(X,Y), Ws),       sort(Ws, W),
+    findall((X,Y), gold(X,Y), G),
+    findall((X,Y), (cell(X,Y), safe(X,Y)), Ss), sort(Ss, S),
+    write('Pit    at : '), write(P), nl,
+    write('Wumpus at : '), write(W), nl,
+    write('Gold   at : '), write(G), nl,
+    write('Safe cells: '), write(S), nl.
+
+% ---------- QUERIES ----------
+% ?- demo.
+%   Pit    at : [(3,1)]
+%   Wumpus at : [(1,3)]
+%   Gold   at : [(2,3)]
+% ?- pit(3,1).      -> true.
+% ?- safe(3,2).     -> true.
+% ?- gold(X,Y).     -> X = 2, Y = 3.

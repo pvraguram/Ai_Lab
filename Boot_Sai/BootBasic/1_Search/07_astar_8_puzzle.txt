@@ -1,0 +1,57 @@
+# A* FOR 8-PUZZLE (state-space template; works for any sliding puzzle)
+# h1 = misplaced tiles, h2 = Manhattan distance. Set N = 2 for 4-puzzle.
+# Run: python 07_astar_8_puzzle.txt
+import heapq
+
+N = 3
+goal  = (1, 2, 3, 4, 5, 6, 7, 8, 0)      # 0 = blank
+start = (1, 2, 3, 4, 0, 6, 7, 5, 8)
+
+def misplaced(s):
+    return sum(1 for i in range(N * N) if s[i] != 0 and s[i] != goal[i])
+
+def manhattan(s):
+    d = 0
+    for i, t in enumerate(s):
+        if t != 0:
+            j = goal.index(t)
+            d += abs(i // N - j // N) + abs(i % N - j % N)
+    return d
+
+def neighbors(s):
+    z = s.index(0)
+    r, c = divmod(z, N)
+    result = []
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < N and 0 <= nc < N:
+            l = list(s)
+            k = nr * N + nc
+            l[z], l[k] = l[k], l[z]
+            result.append(tuple(l))
+    return result
+
+def astar(h):
+    pq = [(h(start), 0, start, [start])]
+    visited = set()
+    while pq:
+        f, g, s, path = heapq.heappop(pq)
+        if s in visited:
+            continue
+        visited.add(s)
+        if s == goal:
+            return path, len(visited)
+        for nb in neighbors(s):
+            if nb not in visited:
+                heapq.heappush(pq, (g + 1 + h(nb), g + 1, nb, path + [nb]))
+    return None, len(visited)
+
+for name, h in [("Misplaced", misplaced), ("Manhattan", manhattan)]:
+    path, expanded = astar(h)
+    print(f"{name}: moves = {len(path) - 1}, nodes expanded = {expanded}")
+
+path, _ = astar(manhattan)
+for s in path:
+    for i in range(0, N * N, N):
+        print(s[i:i + N])
+    print()

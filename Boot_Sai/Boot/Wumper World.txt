@@ -1,0 +1,133 @@
+% ============================================
+% WUMPUS WORLD - PROPOSITIONAL REASONING
+% ============================================
+
+% --------------------------------------------
+% FACTS
+% --------------------------------------------
+
+% Cell (1,1) is safe
+safe(1,1).
+
+% There is a pit at (3,1)
+pit(3,1).
+
+% Wumpus is at (4,1)
+wumpus(4,1).
+
+% Gold is at (2,3)
+gold(2,3).
+
+
+% --------------------------------------------
+% BREEZE RULE
+% --------------------------------------------
+
+% A cell is breezy if an adjacent cell
+% contains a pit.
+
+breeze(X,Y) :-
+    adjacent(X,Y,A,B),
+    pit(A,B).
+
+
+% --------------------------------------------
+% STENCH RULE
+% --------------------------------------------
+
+% A cell has stench if an adjacent cell
+% contains the Wumpus.
+
+stench(X,Y) :-
+    adjacent(X,Y,A,B),
+    wumpus(A,B).
+
+
+% --------------------------------------------
+% ADJACENT CELLS
+% --------------------------------------------
+
+adjacent(X,Y,A,Y) :-
+    A is X + 1.
+
+adjacent(X,Y,A,Y) :-
+    A is X - 1.
+
+adjacent(X,Y,X,B) :-
+    B is Y + 1.
+
+adjacent(X,Y,X,B) :-
+    B is Y - 1.
+
+
+% --------------------------------------------
+% SAFE CELL
+% --------------------------------------------
+
+safe_cell(X,Y) :-
+    \+ pit(X,Y),
+    \+ wumpus(X,Y).
+
+
+?- breeze(2,3).
+?- stench(4,3).
+?- glitter(2,3).
+?- safe_cell(2,1).
+
+
+
+
+
+
+
+
+
+
+% Example hazards and gold
+pit(3,3).
+wumpus(4,4).
+gold(2,3).
+
+% Adjacency on a 4x4 grid
+adjacent(X,Y,A,Y) :-
+    A is X+1, A =< 4.
+adjacent(X,Y,A,Y) :-
+    A is X-1, A >= 1.
+adjacent(X,Y,X,B) :-
+    B is Y+1, B =< 4.
+adjacent(X,Y,X,B) :-
+    B is Y-1, B >= 1.
+
+% Percepts caused by hazards
+breeze(X,Y) :-
+    adjacent(X,Y,A,B),
+    pit(A,B).
+
+stench(X,Y) :-
+    adjacent(X,Y,A,B),
+    wumpus(A,B).
+
+glitter(X,Y) :-
+    gold(X,Y).
+
+% Observations at a visited cell
+known_percept(1,1,no_breeze).
+known_percept(1,1,no_stench).
+
+% No breeze means adjacent cells have no pits
+no_pit(A,B) :-
+    known_percept(X,Y,no_breeze),
+    adjacent(X,Y,A,B).
+
+% No stench means adjacent cells have no Wumpus
+no_wumpus(A,B) :-
+    known_percept(X,Y,no_stench),
+    adjacent(X,Y,A,B).
+
+% Assume the starting cell is safe
+no_pit(1,1).
+no_wumpus(1,1).
+
+safe_cell(X,Y) :-
+    no_pit(X,Y),
+    no_wumpus(X,Y).

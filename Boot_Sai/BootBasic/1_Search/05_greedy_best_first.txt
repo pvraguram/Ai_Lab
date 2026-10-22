@@ -1,0 +1,29 @@
+# GREEDY BEST FIRST SEARCH - expand node with smallest h(n)
+# Run: python 05_greedy_best_first.txt
+import heapq
+
+graph = {
+    'S': ['A', 'B'],
+    'A': ['C', 'D'],
+    'B': ['E'],
+    'C': [], 'D': ['G'], 'E': ['G'], 'G': []
+}
+h = {'S': 7, 'A': 4, 'B': 5, 'C': 6, 'D': 2, 'E': 3, 'G': 0}
+
+def greedy(start, goal):
+    pq = [(h[start], start, [start])]
+    visited = set()
+    while pq:
+        _, node, path = heapq.heappop(pq)
+        if node in visited:
+            continue
+        visited.add(node)
+        print("Expand", node, "h =", h[node])
+        if node == goal:
+            return path
+        for nb in graph[node]:
+            if nb not in visited:
+                heapq.heappush(pq, (h[nb], nb, path + [nb]))
+    return None
+
+print("Path:", greedy('S', 'G'))

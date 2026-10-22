@@ -1,0 +1,714 @@
+% ============================================================
+%                    AI LAB - PROLOG
+%                 ALL-IN-ONE MASTER CODE
+% ============================================================
+%
+% Covers:
+% 1. Knowledge Base & Inference
+% 2. First Order Logic
+% 3. Propositional Logic
+% 4. Entailment / Rule Inference
+% 5. Forward Chaining
+% 6. Wumpus World
+% 7. Cryptarithmetic
+%    - SEND + MORE = MONEY
+%    - TWO + TWO = FOUR
+%    - SUN + FUN = SWIM
+%
+% ============================================================
+
+
+% ============================================================
+% 1. KNOWLEDGE BASE
+% ============================================================
+
+parent(john, mary).
+parent(john, david).
+parent(mary, susan).
+parent(david, tom).
+
+male(john).
+male(david).
+male(tom).
+
+female(mary).
+female(susan).
+
+
+% ----------------------------
+% Rules
+% ----------------------------
+
+father(X, Y) :-
+    parent(X, Y),
+    male(X).
+
+mother(X, Y) :-
+    parent(X, Y),
+    female(X).
+
+grandparent(X, Z) :-
+    parent(X, Y),
+    parent(Y, Z).
+
+sibling(X, Y) :-
+    parent(P, X),
+    parent(P, Y),
+    X \= Y.
+
+
+% ============================================================
+% 2. FIRST ORDER LOGIC
+% ============================================================
+
+% Example:
+% All humans are mortal.
+% Socrates is a human.
+% Therefore Socrates is mortal.
+
+human(socrates).
+human(plato).
+
+mortal(X) :-
+    human(X).
+
+
+% ============================================================
+% 3. PROPOSITIONAL LOGIC
+% ============================================================
+
+% Facts
+
+p.
+q.
+
+
+% Implication:
+% P -> R
+r :-
+    p.
+
+
+% Q -> S
+s :-
+    q.
+
+
+% P AND Q -> T
+
+t :-
+    p,
+    q.
+
+
+% T -> U
+
+u :-
+    t.
+
+
+% OR:
+% P OR Q -> V
+
+v :-
+    p.
+
+v :-
+    q.
+
+
+% NOT example
+
+not_r :-
+    \+ r.
+
+
+% ============================================================
+% 4. SIMPLE ENTAILMENT / INFERENCE
+% ============================================================
+
+% Example:
+%
+% P
+% P -> Q
+% Q -> R
+%
+% Therefore R
+
+entail_q :-
+    p.
+
+entail_r :-
+    q.
+
+% Query:
+% ?- r.
+% ?- entail_r.
+
+
+% ============================================================
+% 5. FORWARD CHAINING
+% ============================================================
+
+% Initial facts
+
+fc_fact(a).
+fc_fact(b).
+
+
+% Rules
+
+fc_rule(a, c).
+fc_rule(b, d).
+fc_rule(c, e).
+fc_rule(d, e).
+
+
+% Get all initial facts
+
+initial_facts(Facts) :-
+    findall(X, fc_fact(X), Facts).
+
+
+% Find facts that can be derived
+
+derive(Facts, NewFacts) :-
+
+    findall(
+        Y,
+        (
+            fc_rule(X, Y),
+            member(X, Facts),
+            \+ member(Y, Facts)
+        ),
+        Temp
+    ),
+
+    sort(Temp, NewFacts).
+
+
+% Stop when no new facts
+
+forward_chain(Facts, Facts) :-
+    derive(Facts, []),
+    !.
+
+
+% Continue deriving
+
+forward_chain(Facts, FinalFacts) :-
+
+    derive(Facts, NewFacts),
+
+    append(Facts, NewFacts, UpdatedFacts),
+
+    forward_chain(UpdatedFacts, FinalFacts).
+
+
+% Run forward chaining
+
+run_forward_chaining(Result) :-
+
+    initial_facts(Facts),
+
+    forward_chain(Facts, Result).
+
+
+% Expected:
+% ?- run_forward_chaining(R).
+% R = [a,b,c,d,e].
+
+
+% ============================================================
+% 6. WUMPUS WORLD
+% ============================================================
+
+% ----------------------------
+% World facts
+% ----------------------------
+
+pit(3,1).
+
+wumpus(4,1).
+
+gold(2,3).
+
+
+% ----------------------------
+% Adjacent cells
+% ----------------------------
+
+adjacent(X, Y, X2, Y) :-
+    X2 is X + 1.
+
+adjacent(X, Y, X2, Y) :-
+    X2 is X - 1.
+
+adjacent(X, Y, X, Y2) :-
+    Y2 is Y + 1.
+
+adjacent(X, Y, X, Y2) :-
+    Y2 is Y - 1.
+
+
+% ----------------------------
+% Breeze
+% ----------------------------
+
+% A cell has breeze if an
+% adjacent cell contains a pit.
+
+breeze(X, Y) :-
+    adjacent(X, Y, A, B),
+    pit(A, B).
+
+
+% ----------------------------
+% Stench
+% ----------------------------
+
+% A cell has stench if an
+% adjacent cell contains Wumpus.
+
+stench(X, Y) :-
+    adjacent(X, Y, A, B),
+    wumpus(A, B).
+
+
+% ----------------------------
+% Safe cell
+% ----------------------------
+
+safe(X, Y) :-
+    \+ pit(X, Y),
+    \+ wumpus(X, Y).
+
+
+% ============================================================
+% 7. CRYPTARITHMETIC
+% ============================================================
+
+:- use_module(library(clpfd)).
+
+
+% ============================================================
+% SEND + MORE = MONEY
+% ============================================================
+
+send_more_money(S, E, N, D, M, O, R, Y) :-
+
+    Vars = [S,E,N,D,M,O,R,Y],
+
+    Vars ins 0..9,
+
+    all_distinct(Vars),
+
+    S #\= 0,
+    M #\= 0,
+
+    1000*S + 100*E + 10*N + D
+    +
+    1000*M + 100*O + 10*R + E
+    #=
+    10000*M + 1000*O + 100*N + 10*E + Y,
+
+    labeling([], Vars).
+
+
+% ============================================================
+% TWO + TWO = FOUR
+% ============================================================
+
+two_two_four(T, W, O, F, U, R) :-
+
+    Vars = [T,W,O,F,U,R],
+
+    Vars ins 0..9,
+
+    all_distinct(Vars),
+
+    T #\= 0,
+    F #\= 0,
+
+    100*T + 10*W + O
+    +
+    100*T + 10*W + O
+    #=
+    1000*F + 100*O + 10*U + R,
+
+    labeling([], Vars).
+
+
+% ============================================================
+% SUN + FUN = SWIM
+% ============================================================
+
+sun_fun_swim(S, U, N, F, W, I, M) :-
+
+    Vars = [S,U,N,F,W,I,M],
+
+    Vars ins 0..9,
+
+    all_distinct(Vars),
+
+    S #\= 0,
+    F #\= 0,
+
+    100*S + 10*U + N
+    +
+    100*F + 10*U + N
+    #=
+    1000*S + 100*W + 10*I + M,
+
+    labeling([], Vars).
+% ============================================================
+% 8. UNIFICATION
+% ============================================================
+
+% Prolog performs unification automatically.
+%
+% Example:
+%
+% parent(john, mary).
+%
+% Query:
+% ?- parent(john, X).
+%
+% Result:
+% X = mary.
+
+
+parent_unification(john, mary).
+parent_unification(john, david).
+parent_unification(mary, susan).
+
+% Example queries:
+%
+% ?- parent_unification(john, X).
+% X = mary ;
+% X = david.
+
+
+% ============================================================
+% 9. UNIFICATION WITH RULES
+% ============================================================
+
+grandparent_unification(X, Z) :-
+    parent_unification(X, Y),
+    parent_unification(Y, Z).
+
+% Query:
+%
+% ?- grandparent_unification(john, X).
+%
+% X = susan.
+
+
+% ============================================================
+% 10. BACKWARD CHAINING
+% ============================================================
+
+% Prolog naturally uses goal-directed
+% backward chaining.
+
+human_bc(socrates).
+
+mortal_bc(X) :-
+    human_bc(X).
+
+% Query:
+%
+% ?- mortal_bc(socrates).
+%
+% Execution:
+%
+% Goal:
+% mortal_bc(socrates)
+%
+% Find rule:
+% mortal_bc(X) :- human_bc(X)
+%
+% New subgoal:
+% human_bc(socrates)
+%
+% Fact exists
+%
+% TRUE.
+
+
+% ============================================================
+% 11. BACKWARD CHAINING WITH MULTIPLE RULES
+% ============================================================
+
+animal(dog).
+animal(cat).
+
+has_fur(dog).
+has_fur(cat).
+
+mammal(X) :-
+    animal(X),
+    has_fur(X).
+
+% Query:
+%
+% ?- mammal(dog).
+% true.
+%
+% ?- mammal(X).
+% X = dog ;
+% X = cat.
+
+
+% ============================================================
+%              RESOLUTION IN PROLOG
+% ============================================================
+
+% A clause is represented as a list of literals.
+%
+% p       = P
+% not_p   = NOT P
+%
+% Example:
+% [p, q]      means P OR Q
+% [not_p]     means NOT P
+
+
+% ============================================================
+% COMPLEMENTARY LITERALS
+% ============================================================
+
+complement(p, not_p).
+complement(not_p, p).
+
+complement(q, not_q).
+complement(not_q, q).
+
+complement(r, not_r).
+complement(not_r, r).
+
+
+% ============================================================
+% RESOLVE TWO CLAUSES
+% ============================================================
+
+resolve(C1, C2, Resolvent) :-
+
+    member(L1, C1),
+
+    complement(L1, L2),
+
+    member(L2, C2),
+
+    delete(C1, L1, R1),
+
+    delete(C2, L2, R2),
+
+    append(R1, R2, Temp),
+
+    sort(Temp, Resolvent).
+
+
+% ============================================================
+% EXAMPLE
+%
+% C1 = P OR Q
+% C2 = NOT P
+%
+% Result = Q
+% ============================================================
+
+example_resolution(Result) :-
+
+    C1 = [p, q],
+
+    C2 = [not_p],
+
+    resolve(C1, C2, Result).
+
+
+% Query:
+%
+% ?- example_resolution(R).
+%
+% R = [q].
+
+
+CNF:
+
+
+complement(p, not_p).
+complement(not_p, p).
+complement(q, not_q).
+complement(not_q, q).
+
+resolve(C1, C2, Result) :-
+    member(L1, C1),
+    complement(L1, L2),
+    member(L2, C2),
+    select(L1, C1, R1),
+    select(L2, C2, R2),
+    append(R1, R2, Temp),
+    sort(Temp, Result).
+
+% CNF clauses:
+% P -> Q becomes NOT P OR Q
+clause1([not_p, q]).
+clause2([p]).
+clause3([not_q]).
+
+prove_q(Result) :-
+    clause1(C1),
+    clause2(C2),
+    resolve(C1, C2, Derived),
+    clause3(C3),
+    resolve(Derived, C3, Result).
+
+% ============================================================
+% 13. BACKTRACKING
+% ============================================================
+
+parent_bt(john, mary).
+parent_bt(john, david).
+parent_bt(john, alex).
+
+% Query:
+%
+% ?- parent_bt(john, X).
+%
+% X = mary ;
+% X = david ;
+% X = alex.
+
+% Press ; to ask Prolog for another solution.
+
+
+% ============================================================
+% 14. RECURSION
+% ============================================================
+
+parent_rec(john, mary).
+parent_rec(mary, susan).
+parent_rec(susan, alice).
+
+ancestor(X, Y) :-
+    parent_rec(X, Y).
+
+ancestor(X, Y) :-
+    parent_rec(X, Z),
+    ancestor(Z, Y).
+
+% Queries:
+%
+% ?- ancestor(john, susan).
+% true.
+%
+% ?- ancestor(john, alice).
+% true.
+%
+% ?- ancestor(john, X).
+% X = mary ;
+% X = susan ;
+% X = alice.
+
+
+% ============================================================
+% 15. NEGATION AS FAILURE
+% ============================================================
+
+has_pit(3,1).
+
+has_wumpus(4,1).
+
+safe_cell(X,Y) :-
+    \+ has_pit(X,Y),
+    \+ has_wumpus(X,Y).
+
+% Queries:
+%
+% ?- safe_cell(1,1).
+% true.
+%
+% ?- safe_cell(3,1).
+% false.
+%
+% ?- safe_cell(4,1).
+% false.
+
+
+% ============================================================
+% 16. FORWARD VS BACKWARD CHAINING DEMO
+% ============================================================
+
+% Facts
+
+fc_demo(p).
+fc_demo(q).
+
+% Rules
+
+fc_demo_rule(r) :-
+    fc_demo(p).
+
+fc_demo_rule(s) :-
+    fc_demo(q).
+
+fc_demo_rule(t) :-
+    fc_demo(r),
+    fc_demo(s).
+
+
+% Backward reasoning:
+%
+% Query:
+% ?- fc_demo_rule(t).
+%
+% Prolog starts from t,
+% searches for r and s,
+% then checks p and q.
+
+
+% ============================================================
+% 17. COMBINED UNIFICATION + BACKWARD CHAINING
+% ============================================================
+
+parent_combined(john, mary).
+parent_combined(mary, susan).
+
+grandparent_combined(X, Z) :-
+    parent_combined(X, Y),
+    parent_combined(Y, Z).
+
+% Query:
+%
+% ?- grandparent_combined(john, X).
+%
+% Unification:
+% X = susan
+%
+% Backward chaining:
+%
+% grandparent(john, X)
+%       ↓
+% parent(john,Y)
+%       ↓
+% Y = mary
+%       ↓
+% parent(mary,X)
+%       ↓
+% X = susan
+%
+% Result:
+% X = susan.
+
+
+% ============================================================
+% END OF ADDITIONAL PROLOG SECTIONS
+% ============================================================
+
+
+
+
+% ============================================================
+% END OF MASTER CODE
+% ============================================================

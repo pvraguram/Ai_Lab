@@ -1,0 +1,86 @@
+import random
+import math
+
+N = 8
+
+# Random initial board
+def random_board():
+    return [random.randint(0, N - 1) for _ in range(N)]
+
+# Calculate number of attacking pairs
+def conflicts(board):
+    count = 0
+
+    for i in range(N):
+        for j in range(i + 1, N):
+
+            # Same column
+            if board[i] == board[j]:
+                count += 1
+
+            # Same diagonal
+            if abs(board[i] - board[j]) == abs(i - j):
+                count += 1
+
+    return count
+
+
+# Simulated Annealing
+def simulated_annealing():
+
+    current = random_board()
+    current_cost = conflicts(current)
+
+    temperature = 100
+    cooling_rate = 0.99
+
+    while temperature > 0.001:
+
+        # Goal reached
+        if current_cost == 0:
+            return current
+
+        # Generate neighbour
+        neighbor = current.copy()
+
+        row = random.randint(0, N - 1)
+        neighbor[row] = random.randint(0, N - 1)
+
+        neighbor_cost = conflicts(neighbor)
+
+        # Difference in cost
+        delta = neighbor_cost - current_cost
+
+        # Accept better solution
+        if delta < 0:
+            current = neighbor
+            current_cost = neighbor_cost
+
+        # Sometimes accept worse solution
+        else:
+            probability = math.exp(-delta / temperature)
+
+            if random.random() < probability:
+                current = neighbor
+                current_cost = neighbor_cost
+
+        # Cool down
+        temperature *= cooling_rate
+
+    return current
+
+
+# Run algorithm
+solution = simulated_annealing()
+
+print("Solution:", solution)
+print("Conflicts:", conflicts(solution))
+
+# Display board
+for row in range(N):
+    for col in range(N):
+        if solution[row] == col:
+            print("Q", end=" ")
+        else:
+            print(".", end=" ")
+    print()

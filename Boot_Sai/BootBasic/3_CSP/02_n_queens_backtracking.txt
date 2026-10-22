@@ -1,0 +1,28 @@
+# N-QUEENS USING BACKTRACKING (CSP)
+# Variable = row, value = column, constraint = no shared column/diagonal
+# Run: python 02_n_queens_backtracking.txt
+N = 8
+board = [-1] * N
+
+def safe(row, col):
+    for r in range(row):
+        c = board[r]
+        if c == col or abs(c - col) == row - r:
+            return False
+    return True
+
+def solve(row=0):
+    if row == N:
+        return True
+    for col in range(N):
+        if safe(row, col):
+            board[row] = col
+            if solve(row + 1):
+                return True
+            board[row] = -1          # backtrack
+    return False
+
+if solve():
+    print("Solution:", board)
+    for r in range(N):
+        print(" ".join("Q" if board[r] == c else "." for c in range(N)))

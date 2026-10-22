@@ -1,0 +1,30 @@
+# UCS - Uniform Cost Search (expand lowest path cost g(n) first)
+# Run: python 04_ucs.txt
+import heapq
+
+graph = {
+    'S': [('A', 1), ('B', 4)],
+    'A': [('B', 2), ('C', 5)],
+    'B': [('C', 1)],
+    'C': [('G', 3)],
+    'G': []
+}
+
+def ucs(start, goal):
+    pq = [(0, start, [start])]                 # (cost, node, path)
+    visited = set()
+    while pq:
+        cost, node, path = heapq.heappop(pq)
+        if node in visited:
+            continue
+        visited.add(node)
+        print(f"Expand {node} cost={cost}")
+        if node == goal:
+            return path, cost
+        for nb, w in graph[node]:
+            if nb not in visited:
+                heapq.heappush(pq, (cost + w, nb, path + [nb]))
+    return None, None
+
+path, cost = ucs('S', 'G')
+print("Path:", path, "Cost:", cost)

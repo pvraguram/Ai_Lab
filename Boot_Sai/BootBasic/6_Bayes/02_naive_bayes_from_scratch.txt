@@ -1,0 +1,51 @@
+# NAIVE BAYES FROM SCRATCH (no sklearn) - categorical data
+# P(class | x1..xn) is proportional to P(class) * product of P(xi | class)
+# Laplace smoothing avoids zero probabilities.
+# Run: python 02_naive_bayes_from_scratch.txt
+from collections import Counter, defaultdict
+
+# (Outlook, Temperature, Humidity, Windy) -> Play
+data = [
+    (("Sunny", "Hot", "High", "No"), "No"),
+    (("Sunny", "Hot", "High", "Yes"), "No"),
+    (("Overcast", "Hot", "High", "No"), "Yes"),
+    (("Rainy", "Mild", "High", "No"), "Yes"),
+    (("Rainy", "Cool", "Normal", "No"), "Yes"),
+    (("Rainy", "Cool", "Normal", "Yes"), "No"),
+    (("Overcast", "Cool", "Normal", "Yes"), "Yes"),
+    (("Sunny", "Mild", "High", "No"), "No"),
+    (("Sunny", "Cool", "Normal", "No"), "Yes"),
+    (("Rainy", "Mild", "Normal", "No"), "Yes"),
+    (("Sunny", "Mild", "Normal", "Yes"), "Yes"),
+    (("Overcast", "Mild", "High", "Yes"), "Yes"),
+    (("Overcast", "Hot", "Normal", "No"), "Yes"),
+    (("Rainy", "Mild", "High", "Yes"), "No"),
+]
+
+# ---------- training: count ----------
+class_count = Counter(label for _, label in data)
+feat_count = defaultdict(Counter)            # (feature index, class) -> value counts
+feat_values = defaultdict(set)
+for x, label in data:
+    for i, v in enumerate(x):
+        feat_count[(i, label)][v] += 1
+        feat_values[i].add(v)
+
+def predict(x):
+    probs = {}
+    for c in class_count:
+        p = class_count[c] / len(data)                       # prior
+        for i, v in enumerate(x):                            # likelihoods
+            p *= (feat_count[(i, c)][v] + 1) / (class_count[c] + len(feat_values[i]))
+        probs[c] = p
+    total = sum(probs.values())
+    for c in probs:
+        print(f"  P({c} | x) = {probs[c] / total:.3f}")
+    return max(probs, key=probs.get)
+
+test = ("Sunny", "Cool", "High", "Yes")
+print("Test:", test)
+print("Prediction: Play =", predict(test))
+
+correct = sum(predict(x) == y for x, y in data)
+print("Training accuracy:", correct / len(data))

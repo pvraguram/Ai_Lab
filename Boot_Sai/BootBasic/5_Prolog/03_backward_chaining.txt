@@ -1,0 +1,38 @@
+% ============================================================
+% BACKWARD CHAINING (goal-driven) - explicit program
+% Start from the GOAL, find a rule that concludes it, and
+% recursively prove each of that rule's premises.
+% Run: swipl 03_backward_chaining.txt
+%      ?- prove(green(fritz)).
+% ============================================================
+
+fact(croaks(fritz)).
+fact(eats_flies(fritz)).
+
+rule(frog(X),   [croaks(X), eats_flies(X)]).
+rule(canary(X), [chirps(X), sings(X)]).
+rule(green(X),  [frog(X)]).
+rule(yellow(X), [canary(X)]).
+
+prove(Goal) :- prove(Goal, 0).
+
+prove(Goal, D) :-
+    fact(Goal),
+    tab(D), write(Goal), write('  is a known fact'), nl.
+prove(Goal, D) :-
+    rule(Goal, Premises),
+    tab(D), write('To prove '), write(Goal), write(' prove '), write(Premises), nl,
+    D1 is D + 2,
+    prove_all(Premises, D1).
+
+prove_all([], _).
+prove_all([P|Ps], D) :- prove(P, D), prove_all(Ps, D).
+
+% ---------- QUERIES ----------
+% ?- prove(green(fritz)).
+%    To prove green(fritz) prove [frog(fritz)]
+%      To prove frog(fritz) prove [croaks(fritz),eats_flies(fritz)]
+%        croaks(fritz)  is a known fact
+%        eats_flies(fritz)  is a known fact
+%    true.
+% ?- prove(yellow(fritz)).   -> false.

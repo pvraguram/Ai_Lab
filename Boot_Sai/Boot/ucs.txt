@@ -1,0 +1,97 @@
+import heapq
+
+
+# ============================================================
+# UNIFORM COST SEARCH - MASTER PROGRAM
+# ============================================================
+
+def uniform_cost_search(graph, start, goal):
+
+    # Priority queue:
+    # (total_cost, current_node, path)
+    pq = [(0, start, [start])]
+
+    # Stores the minimum cost already found for each node
+    best_cost = {}
+
+    while pq:
+
+        cost, node, path = heapq.heappop(pq)
+
+        # If we already reached this node with a cheaper cost
+        if node in best_cost and cost > best_cost[node]:
+            continue
+
+        best_cost[node] = cost
+
+        # Goal test
+        if node == goal:
+            return path, cost
+
+        # Expand current node
+        for neighbor, edge_cost in graph[node]:
+
+            new_cost = cost + edge_cost
+
+            # Add if this is a better path
+            if neighbor not in best_cost or new_cost < best_cost[neighbor]:
+
+                heapq.heappush(
+                    pq,
+                    (new_cost, neighbor, path + [neighbor])
+                )
+
+    return None, float("inf")
+
+
+# ============================================================
+# EXAMPLE 1: WEIGHTED GRAPH
+# ============================================================
+
+graph = {
+
+    'A': [('B', 2), ('C', 5)],
+
+    'B': [('A', 2), ('C', 1), ('D', 4)],
+
+    'C': [('A', 5), ('B', 1), ('D', 1)],
+
+    'D': [('B', 4), ('C', 1), ('E', 3)],
+
+    'E': [('D', 3)]
+}
+
+
+start = 'A'
+goal = 'E'
+
+path, cost = uniform_cost_search(graph, start, goal)
+
+
+print("===== UNIFORM COST SEARCH =====")
+
+if path:
+    print("Start:", start)
+    print("Goal:", goal)
+    print("Path:", " -> ".join(path))
+    print("Total Cost:", cost)
+else:
+    print("No path found")
+
+
+# ============================================================
+# EXAMPLE 2: CHANGE START AND GOAL
+# ============================================================
+
+start = 'A'
+goal = 'D'
+
+path, cost = uniform_cost_search(graph, start, goal)
+
+print("\nSecond Query")
+
+if path:
+    print("Path:", " -> ".join(path))
+    print("Cost:", cost)
+else:
+    print("No path found")

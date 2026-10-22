@@ -1,0 +1,49 @@
+# GENETIC ALGORITHM - maximize f(x) = x^2, x in 0..31
+# Chromosome = 5-bit binary string (e.g. 10110 = 22)
+# Steps: population -> fitness -> selection -> crossover -> mutation
+# Run: python 03_genetic_algorithm.txt
+import random
+
+BITS = 5
+POP = 6
+GENERATIONS = 20
+MUTATION_RATE = 0.1
+
+def decode(ch):
+    return int(ch, 2)
+
+def fitness(ch):
+    return decode(ch) ** 2          # change f(x) for any question
+
+def selection(pop):                 # roulette wheel selection
+    total = sum(fitness(c) for c in pop)
+    if total == 0:
+        return random.choice(pop)
+    r = random.uniform(0, total)
+    s = 0
+    for c in pop:
+        s += fitness(c)
+        if s >= r:
+            return c
+
+def crossover(p1, p2):              # single-point crossover
+    point = random.randint(1, BITS - 1)
+    return p1[:point] + p2[point:], p2[:point] + p1[point:]
+
+def mutate(ch):                     # bit-flip mutation
+    return "".join(('1' if b == '0' else '0') if random.random() < MUTATION_RATE else b
+                   for b in ch)
+
+pop = ["".join(random.choice("01") for _ in range(BITS)) for _ in range(POP)]
+
+for gen in range(GENERATIONS):
+    pop.sort(key=fitness, reverse=True)
+    print(f"Gen {gen}: best {pop[0]} x={decode(pop[0])} f={fitness(pop[0])}")
+    new_pop = [pop[0]]                         # elitism
+    while len(new_pop) < POP:
+        c1, c2 = crossover(selection(pop), selection(pop))
+        new_pop += [mutate(c1), mutate(c2)]
+    pop = new_pop[:POP]
+
+best = max(pop, key=fitness)
+print(f"\nBest: {best}  x = {decode(best)}  f(x) = {fitness(best)}")

@@ -1,0 +1,24 @@
+# SIMULATED ANNEALING - minimize any function f(x)
+# Accept better moves always; worse moves with probability e^(-delta/T).
+# Temperature T decreases slowly (cooling).
+# Run: python 02_simulated_annealing.txt
+import random, math
+
+def f(x):
+    return x**2 - 4*x + 4 + 3*math.sin(5*x)   # bumpy function (change for any question)
+
+def simulated_annealing(T=100, cooling=0.95, T_min=0.001):
+    x = random.uniform(-10, 10)
+    best = x
+    while T > T_min:
+        new_x = x + random.uniform(-1, 1)          # random neighbour
+        delta = f(new_x) - f(x)
+        if delta < 0 or random.random() < math.exp(-delta / T):
+            x = new_x                               # accept move
+        if f(x) < f(best):
+            best = x
+        T *= cooling                                # cool down
+    return best
+
+x = simulated_annealing()
+print(f"Minimum found at x = {x:.3f}, f(x) = {f(x):.3f}")

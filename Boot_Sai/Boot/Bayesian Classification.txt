@@ -1,0 +1,89 @@
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+
+# Sample messages
+X = [
+    "Congratulations you won a free lottery",
+    "Win cash prize now",
+    "Claim your free reward",
+    "You have won a free ticket",
+    "Free money waiting for you",
+    "Call me when you reach home",
+    "Can we meet tomorrow",
+    "Please submit the assignment",
+    "Your class starts at 10 AM",
+    "Let's have lunch today"
+]
+
+# 1 = Spam, 0 = Not Spam
+y = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
+
+# Convert text into numerical features
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(X)
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Create Naive Bayes classifier
+model = MultinomialNB()
+
+# Train
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Accuracy
+print("Predictions:", y_pred)
+print("Actual:", y_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+
+# Test a new message
+message = ["Congratulations! You won a free prize"]
+
+message = vectorizer.transform(message)
+
+prediction = model.predict(message)
+
+if prediction[0] == 1:
+    print("Spam")
+else:
+    print("Not Spam")
+
+
+
+from sklearn.naive_bayes import GaussianNB
+
+# Training data
+X = [
+    [25, 50],
+    [30, 60],
+    [35, 80],
+    [40, 90],
+    [22, 30],
+    [28, 45],
+    [45, 100],
+    [50, 120]
+]
+
+# Classes
+y = [0, 0, 1, 1, 0, 0, 1, 1]
+
+# Create model
+model = GaussianNB()
+
+# Train model
+model.fit(X, y)
+
+# New data to predict
+new_data = [[32, 70]]
+
+# Prediction
+prediction = model.predict(new_data)
+
+print("Prediction:", prediction[0])
