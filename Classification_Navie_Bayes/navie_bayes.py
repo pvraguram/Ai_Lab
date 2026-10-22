@@ -1,47 +1,31 @@
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import LabelEncoder
 
-# Training data: Outlook, Temperature
-X = [
-    ["Sunny", "Hot"],
-    ["Sunny", "Cool"],
-    ["Rainy", "Hot"],
-    ["Rainy", "Cool"],
-    ["Overcast", "Hot"],
-    ["Overcast", "Cool"]
-]
+data = []
 
-# Output classes
-y = ["No", "No", "Yes", "Yes", "Yes", "Yes"]
+n = int(input("Enter number of training words: "))
 
-# Convert text into numbers
-encoders = []
+for i in range(n):
+    word = input("Enter word: ").lower()
+    label = input("Enter class (spam/not spam): ").lower()
+    data.append((word, label))
 
-for col in range(2):
-    encoder = LabelEncoder()
-    column = [row[col] for row in X]
-    encoder.fit(column)
+spam = [x for x, y in data if y == "spam"]
+ham = [x for x, y in data if y == "not spam"]
 
-    for row in X:
-        row[col] = encoder.transform([row[col]])[0]
+word = input("Enter a word to classify: ").lower()
 
-    encoders.append(encoder)
+# Prior probabilities
+p_spam = len(spam) / len(data)
+p_ham = len(ham) / len(data)
 
-# Train the classifier
-model = GaussianNB()
-model.fit(X, y)
+# Likelihood with Laplace smoothing
+p_word_spam = (spam.count(word) + 1) / (len(spam) + 2)
+p_word_ham = (ham.count(word) + 1) / (len(ham) + 2)
 
-# Get input from the user
-outlook = input("Enter outlook (Sunny/Rainy/Overcast): ")
-temperature = input("Enter temperature (Hot/Cool): ")
+# Bayes scores (the common denominator is omitted)
+score_spam = p_word_spam * p_spam
+score_ham = p_word_ham * p_ham
 
-# Encode the input
-test = [[
-    encoders[0].transform([outlook])[0],
-    encoders[1].transform([temperature])[0]
-]]
-
-# Predict the class
-prediction = model.predict(test)
-
-print("Predicted class:", prediction[0])
+if score_spam > score_ham:
+    print("Spam")
+else:
+    print("Not Spam")

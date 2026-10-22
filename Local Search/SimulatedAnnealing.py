@@ -2,7 +2,7 @@ import random
 import math
 
 def f(x):
-    return eval(expr, {"__builtins__": {}}, {"x": x, "math": math})
+    return eval(expr, {"x": x, "math": math})
 
 expr = input("Enter function : ")
 choice = input("Find maximum or minimum? (max/min): ").lower()

@@ -5,7 +5,6 @@ def is_safe(node, color, colors, graph):
 
     return True
 
-
 def map_coloring(nodes, graph, number_of_colors):
     colors = {}
 
